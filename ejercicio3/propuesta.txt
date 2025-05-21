@@ -1,0 +1,4 @@
+Ejercicio #3: Simulación de una lista de reproducción de música. Implemente
+una lista de reproducción de música utilizando una lista enlazada. El programa debe
+permitir agregar canciones, eliminar canciones, reproducir la siguiente canción,
+reproducir la canción anterior y mostrar la lista de reproducción actual.

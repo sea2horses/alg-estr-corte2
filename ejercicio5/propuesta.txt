@@ -1,0 +1,3 @@
+Ejercicio #5: Búsqueda en una lista enlazada. Cree una función que busque un
+valor específico en una lista enlazada. La función debe devolver la posición del valor
+si se encuentra, o un mensaje indicando que el valor no está en la lista
