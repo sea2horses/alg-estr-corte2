@@ -53,13 +53,15 @@ if __name__ == "__main__":
         input("Presiona enter para continuar...") 
         continue
 
+
+      # Validamos el postfix
+      if not validar_postfix(postfix):
+        print("La expresión no es válida!")
+        input("Presiona enter para continuar...") 
+        continue
+
       # DEPENDIENDO de la opción, imprimimos o evaluamos el postfix
       if opcion == 1:
-        # Validamos el postfix
-        if not validar_postfix(postfix):
-          print("La expresión no es válida!")
-          input("Presiona enter para continuar...") 
-          continue
         # Ahora lo imprimimos
         print("Expresión a Postfix: ")
         while postfix.length() > 0:
