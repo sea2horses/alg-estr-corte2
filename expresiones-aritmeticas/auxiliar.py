@@ -98,7 +98,7 @@ def a_postfix(tokens: Cola, anidado = 0) -> Cola:
   cola_total = Cola()
   pila_operadores = Pila()
   # Variable para identificar la rama principal (ayuda al control de parentesis)
-  principal = True
+  parentesis_cerrado = False
   # Ultimo tipo (para que no hayan dos operadores o operandos seguidos)
   ultimo_tipo = None
 
@@ -116,7 +116,7 @@ def a_postfix(tokens: Cola, anidado = 0) -> Cola:
         if anidado == 0:
           raise Exception("Parentesis de Cierre extra")
         # Si hay un parentesis de cierre cerramos el estadio y denotamos que no es la rama principal
-        principal = False
+        parentesis_cerrado = True
         break
       case TipoToken.VARIABLE | TipoToken.NUMERO:
         # No pueden haber dos operandos seguidos
@@ -140,7 +140,7 @@ def a_postfix(tokens: Cola, anidado = 0) -> Cola:
     # Actualizamos el ultimo tipo
     ultimo_tipo = token_actual.Tipo
   
-  if anidado > 0 and principal == True and tokens.length() == 0:
+  if anidado > 0 and parentesis_cerrado == False and tokens.length() == 0:
     raise Exception("Más parentesis de apertura que de cierre")
     
   # Ahora vaciamos la pila de operadores a la cola total
@@ -175,10 +175,9 @@ def validar_postfix(postfix: Cola) -> bool:
       if pila.length() < 2:
         # No hay suficientes operandos
         return False
-      # Simulamos la operación
-      pila.pop()
-      pila.pop()
-      # Metemos un resultado ficticio
+      operando2: Token = pila.pop()
+      operando1: Token = pila.pop()
+      
       pila.push(Token(TipoToken.NUMERO, 0))
     else:
       # Token desconocido
@@ -206,28 +205,19 @@ def evaluar_postfix(postfix: Cola):
       # Sacamos los ultimos dos elementos
       operando2: Token = pila_postfix.pop()
       operando1: Token = pila_postfix.pop()
-      # Revisamos que ambos sean numeros
-      if operando1.Tipo != TipoToken.NUMERO or operando2.Tipo != TipoToken.NUMERO:
-        # Pusheamos los operandos de nuevo al bombo
-        pila_postfix.push(operando1)
-        pila_postfix.push(operando2)
-        # Continuamos
-        continue
-      # En caso contrario operemos
-      else:
-        # Vamos a sacar el nuevo numero
-        nuevo_numero = None
-        # Prix operemos
-        match token_actual.Valor:
-          case '+': nuevo_numero = operando1.Valor + operando2.Valor
-          case '-' | '–': nuevo_numero = operando1.Valor - operando2.Valor
-          case '*': nuevo_numero = operando1.Valor * operando2.Valor
-          case '/': nuevo_numero = operando1.Valor / operando2.Valor
-          case '%': nuevo_numero = operando1.Valor % operando2.Valor
-          case '^': nuevo_numero = operando1.Valor ** operando2.Valor
-          case _: raise Exception(f"Operador no manejado en el match: {token_actual.Valor}")
-        # Subimos el numero a la pila
-        pila_postfix.push(Token(TipoToken.NUMERO, nuevo_numero))
+      # Vamos a sacar el nuevo numero
+      nuevo_numero = None
+      # Prix operemos
+      match token_actual.Valor:
+        case '+': nuevo_numero = operando1.Valor + operando2.Valor
+        case '-' | '–': nuevo_numero = operando1.Valor - operando2.Valor
+        case '*': nuevo_numero = operando1.Valor * operando2.Valor
+        case '/': nuevo_numero = operando1.Valor / operando2.Valor
+        case '%': nuevo_numero = operando1.Valor % operando2.Valor
+        case '^': nuevo_numero = operando1.Valor ** operando2.Valor
+        case _: raise Exception(f"Operador no manejado en el match: {token_actual.Valor}")
+      # Subimos el numero a la pila
+      pila_postfix.push(Token(TipoToken.NUMERO, nuevo_numero))
     # Si es una variable
     elif token_actual.Tipo == TipoToken.VARIABLE:
       raise Exception("No se permiten variables en evaluación directaa")
@@ -236,23 +226,4 @@ def evaluar_postfix(postfix: Cola):
   if pila_postfix.length() == 1:
     return pila_postfix.pop().Valor
   else:
-    raise Exception("Error: La expresión no es válida!")
-    
-def evaluar(expresion, debug = False):
-  # Tokenizemos
-  tokens = tokenizar(expresion)
-  # Imprimimos los tokens
-  if tokens == None:
-    print("Hubo un error tokenizando")
-    return
-  elif debug == True:
-    tokens.print()
-
-  # Sacamos postfix
-  postfix = a_postfix(tokens)
-  if debug == True:
-    postfix.print()
-  
-  # Evaluamos el postfix
-  numero = evaluar_postfix(postfix)
-  return numero
+    raise Exception("Error: La expresión no es válida!") 
