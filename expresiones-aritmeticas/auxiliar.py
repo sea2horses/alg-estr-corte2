@@ -99,6 +99,8 @@ def a_postfix(tokens: Cola, anidado = 0) -> Cola:
   pila_operadores = Pila()
   # Variable para identificar la rama principal (ayuda al control de parentesis)
   principal = True
+  # Ultimo tipo (para que no hayan dos operadores o operandos seguidos)
+  ultimo_tipo = None
 
   while tokens.length() > 0:
     token_actual: Token = tokens.pop()
@@ -117,9 +119,15 @@ def a_postfix(tokens: Cola, anidado = 0) -> Cola:
         principal = False
         break
       case TipoToken.VARIABLE | TipoToken.NUMERO:
+        # No pueden haber dos operandos seguidos
+        if ultimo_tipo == TipoToken.VARIABLE or ultimo_tipo == TipoToken.NUMERO:
+          raise Exception("La expresión no es válida! (2 operandos seguidos)")
         # Los operandos los metemos a la cola actual
         cola_total.push(token_actual)
       case TipoToken.OPERADOR:
+        # No pueden haber dos operadores seguidos
+        if ultimo_tipo == TipoToken.OPERADOR:
+          raise Exception("La expresión no es válida! (2 operadores seguidos)")
         # Obtenemos la precedencia del operador
         precedencia_actual = precedencia(token_actual.Valor)
         # Mientras no encontremos un operador con menor precedencia que el actual
@@ -128,6 +136,9 @@ def a_postfix(tokens: Cola, anidado = 0) -> Cola:
           cola_total.push(pila_operadores.pop())
         # Metemos el nuevo operador a la pila
         pila_operadores.push(token_actual)
+      
+    # Actualizamos el ultimo tipo
+    ultimo_tipo = token_actual.Tipo
   
   if anidado > 0 and principal == True and tokens.length() == 0:
     raise Exception("Más parentesis de apertura que de cierre")
@@ -139,23 +150,30 @@ def a_postfix(tokens: Cola, anidado = 0) -> Cola:
   # Retornamos la cola total
   return cola_total
 
+def imprimir_postfix(postfix: Cola):
+  # Creamos una copia de la cola original
+  copia = postfix.copy()
+  # Ahora vamos imprimiendo el valor de cada token
+  while copia.length() > 0:
+    # Tenemos que sacar el valor porque
+    # el postfix almacena tokens
+    token: Token = copia.pop()
+    # Imprimimos el valor
+    print(formatear_float(token.Valor), end=" ")
+
 # Función para validar la expresión sin evaluar
 def validar_postfix(postfix: Cola) -> bool:
   pila = Pila()
   # Hacemos una copia para no modificar el original
-  copia_postfix = Cola()
+  copia_postfix = postfix.copy()
   
-  while postfix.length() > 0:
-    token = postfix.pop()
-    copia_postfix.push(token)
+  while copia_postfix.length() > 0:
+    token = copia_postfix.pop()
     if token.Tipo == TipoToken.NUMERO or token.Tipo == TipoToken.VARIABLE:
       pila.push(token)
     elif token.Tipo == TipoToken.OPERADOR:
       if pila.length() < 2:
         # No hay suficientes operandos
-        # Restauramos la cola original antes de salir
-        while copia_postfix.length() > 0:
-          postfix.push(copia_postfix.pop())
         return False
       # Simulamos la operación
       pila.pop()
@@ -164,13 +182,7 @@ def validar_postfix(postfix: Cola) -> bool:
       pila.push(Token(TipoToken.NUMERO, 0))
     else:
       # Token desconocido
-      # Restauramos la cola original antes de salir
-      while copia_postfix.length() > 0:
-        postfix.push(copia_postfix.pop())
       return False
-  # Restauramos la cola original
-  while copia_postfix.length() > 0:
-    postfix.push(copia_postfix.pop())
   # Al final debe haber exactamente un resultado
   return pila.length() == 1
 

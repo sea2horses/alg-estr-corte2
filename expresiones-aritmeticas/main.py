@@ -1,4 +1,4 @@
-from auxiliar import tokenizar, a_postfix, evaluar_postfix, formatear_float, validar_postfix
+from auxiliar import tokenizar, a_postfix, evaluar_postfix, imprimir_postfix, validar_postfix, formatear_float
 
 # Main
 if __name__ == "__main__":
@@ -59,16 +59,14 @@ if __name__ == "__main__":
         print("La expresión no es válida!")
         input("Presiona enter para continuar...") 
         continue
+      
+      # Imprimimos el postfix
+      print("Expresión a Postfix: ")
+      imprimir_postfix(postfix)
+      # Dos lineas nuevas
+      print("\n")
 
-      # DEPENDIENDO de la opción, imprimimos o evaluamos el postfix
-      if opcion == 1:
-        # Ahora lo imprimimos
-        print("Expresión a Postfix: ")
-        while postfix.length() > 0:
-          print(formatear_float(postfix.pop().Valor), end=" ")
-        # Dos lineas nuevas
-        print("\n")
-      elif opcion == 2:
+      if opcion == 2:
         # Ahora lo evaluamos
         try:
           evaluado = evaluar_postfix(postfix)

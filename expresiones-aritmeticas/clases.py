@@ -57,7 +57,7 @@ class Pila:
       self.Cabeza = nuevo_nodo
       # El siguiente nodo de la nueva cabeza va a ser la vieja cabeza
       nuevo_nodo.Siguiente = vieja_cabeza
-  
+   
   # Eliminar
   def pop(self):
     # Si no hay cabeza
@@ -193,3 +193,18 @@ class Cola:
       nodo_actual = nodo_actual.Siguiente
     # Printeamos el arreglo
     print(valores)
+
+  # Copiar
+  def copy(self) -> 'Cola':
+    nueva_cola = Cola()
+    # Vamos copiando cada valor
+    nodo_actual = self.Cabeza
+    
+    while nodo_actual != None:
+      # Pusheamos el valor a la nueva cola
+      nueva_cola.push(nodo_actual.Valor)
+      # Actualizamos el nodo actual
+      nodo_actual = nodo_actual.Siguiente
+    
+    # Retornamos la nueva cola
+    return nueva_cola
