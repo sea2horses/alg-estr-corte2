@@ -70,13 +70,11 @@ if __name__ == "__main__":
         # Ahora lo evaluamos
         try:
           evaluado = evaluar_postfix(postfix)
+          # Imprimimos el resultado
+          print(f"El resultado de la expresión es: {formatear_float(evaluado)}")
         except Exception as ex:
           print(f"Hubo un problema: {ex}")
-          input("Presiona enter para continuar...") 
-          continue
-        # Imprimimos el resultado
-        print(f"El resultado de la expresión es: {formatear_float(evaluado)}")
-      
+
       input("Presiona enter para continuar...") 
     elif opcion == 3:
       break
